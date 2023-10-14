@@ -1,0 +1,98 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             ARMex, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         
+    4 00000000         start
+    5 00000000 E59F0020        LDR              r0, TEMPADDR1
+    6 00000004 E3A01000        MOV              r1, #0
+    7 00000008 E3A02001        MOV              r2, #1
+    8 0000000C         
+    9 0000000C EB000001        BL               Example1
+   10 00000010 EB000004        BL               Example2
+   11 00000014 EB000003        BL               Example3
+   12 00000018         
+   13 00000018         Example1                             ; Loop
+   14 00000018 E0811002        ADD              r1, r2
+   15 0000001C E2822001        ADD              r2, r2, #1
+   16 00000020 E352000B        CMP              r2, #11
+   17 00000024 1AFFFFFB        BNE              Example1
+   18 00000028         
+   19 00000028         
+   20 00000028         Example2                             ; n(n+1)/2
+   21 00000028         
+   22 00000028         
+   23 00000028         Example3                             ; Unlooping
+   24 00000028         
+   25 00000028         
+   26 00000028 00040000 
+                       TEMPADDR1
+                               &                &40000
+   27 0000002C         
+   28 0000002C E1A0F00E        MOV              pc, lr
+   29 00000030                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\problem3.d -o.\objects\problem3.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 529" --list=.\listings\problem3.lst problem3.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+ARMex 00000000
+
+Symbol: ARMex
+   Definitions
+      At line 1 in file problem3.s
+   Uses
+      None
+Comment: ARMex unused
+Example1 00000018
+
+Symbol: Example1
+   Definitions
+      At line 13 in file problem3.s
+   Uses
+      At line 9 in file problem3.s
+      At line 17 in file problem3.s
+
+Example2 00000028
+
+Symbol: Example2
+   Definitions
+      At line 20 in file problem3.s
+   Uses
+      At line 10 in file problem3.s
+Comment: Example2 used once
+Example3 00000028
+
+Symbol: Example3
+   Definitions
+      At line 23 in file problem3.s
+   Uses
+      At line 11 in file problem3.s
+Comment: Example3 used once
+TEMPADDR1 00000028
+
+Symbol: TEMPADDR1
+   Definitions
+      At line 26 in file problem3.s
+   Uses
+      At line 5 in file problem3.s
+Comment: TEMPADDR1 used once
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 4 in file problem3.s
+   Uses
+      None
+Comment: start unused
+6 symbols
+338 symbols in table
