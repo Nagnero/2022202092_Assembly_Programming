@@ -1,0 +1,99 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             ARMex, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         
+    4 00000000         Start
+    5 00000000 E59F0028        LDR              r0, TEMPADDR1
+    6 00000004 E59F1038        LDR              r1, =string1
+    7 00000008 E3A03000        MOV              r3, #0
+    8 0000000C         
+    9 0000000C         loop
+   10 0000000C E5D12000        LDRB             r2, [r1]    ; string
+   11 00000010 E2811001        ADD              r1, r1, #1  ; move to next char
+                                                            acter
+   12 00000014 E2833001        ADD              r3, r3, #1  ; plus one len
+   13 00000018 E3520000        CMP              r2, #0
+   14 0000001C 0A000000        BEQ              done
+   15 00000020 EAFFFFF9        B                loop
+   16 00000024         
+   17 00000024         done
+   18 00000024 E2433001        SUB              r3, r3, #1
+   19 00000028 E5803000        STR              r3, [r0]
+   20 0000002C E1A0F00E        MOV              pc, lr
+   21 00000030         
+   22 00000030 00040000 
+                       TEMPADDR1
+                               &                &40000
+   23 00000034 48 65 6C 
+              6C 6F 2C 
+              20 57 6F 
+              72 6C 64 
+              21 00    string1 DCB              "Hello, World!", 0
+   24 00000042         
+   25 00000042                 END
+              00 00 00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\problem2.d -o.\objects\problem2.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 529" --list=.\listings\problem2.lst problem2.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+ARMex 00000000
+
+Symbol: ARMex
+   Definitions
+      At line 1 in file problem2.s
+   Uses
+      None
+Comment: ARMex unused
+Start 00000000
+
+Symbol: Start
+   Definitions
+      At line 4 in file problem2.s
+   Uses
+      None
+Comment: Start unused
+TEMPADDR1 00000030
+
+Symbol: TEMPADDR1
+   Definitions
+      At line 22 in file problem2.s
+   Uses
+      At line 5 in file problem2.s
+Comment: TEMPADDR1 used once
+done 00000024
+
+Symbol: done
+   Definitions
+      At line 17 in file problem2.s
+   Uses
+      At line 14 in file problem2.s
+Comment: done used once
+loop 0000000C
+
+Symbol: loop
+   Definitions
+      At line 9 in file problem2.s
+   Uses
+      At line 15 in file problem2.s
+Comment: loop used once
+string1 00000034
+
+Symbol: string1
+   Definitions
+      At line 23 in file problem2.s
+   Uses
+      At line 6 in file problem2.s
+Comment: string1 used once
+6 symbols
+340 symbols in table

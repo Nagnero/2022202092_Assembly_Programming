@@ -1,22 +1,25 @@
-	AREA ARMex, CODE, READONLY
+	AREA    ARMex, CODE, READONLY
 		ENTRY
-
-start
-    mov r1, #1
 	
-Section .text
-    global _ft_strlen
+Start
+	LDR r0, TEMPADDR1
+	LDR r1, =string1
+	MOV r3, #0
 
-_ft_strlen :
-	mov rcx, 0
-	jmp count
+loop
+	LDRB r2, [r1]	; string
+	ADD r1, r1, #1	; move to next character
+	ADD r3, r3, #1	; plus one len
+	CMP r2, #0
+	BEQ done
+	B loop
+   
+done
+	SUB r3, r3, #1
+	STR r3, [r0]
+	MOV pc, lr
 
-count :
-	cmp BYTE [rdi + rcx], 0
-	je end
-	inc rcx
-	jmp count
+TEMPADDR1 & &40000
+string1 DCB "Hello, World!", 0
 
-end :
-	mov rax, rcx
-	ret
+	END
