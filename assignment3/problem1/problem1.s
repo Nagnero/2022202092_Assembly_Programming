@@ -2,10 +2,10 @@
 		ENTRY
 	
 start
-	MOV r0, #11 
-	MOV r1, #1 
-	MOV r2, #5 
-	MOV r3, #2 
+	MOV r0, #11
+	MOV r1, #1
+	MOV r2, #5
+	MOV r3, #2
 	LDR r4, TEMPADDR1
 	
 	B	Example_1

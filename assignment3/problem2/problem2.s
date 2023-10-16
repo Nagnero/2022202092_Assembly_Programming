@@ -5,11 +5,12 @@ Start
 	LDR r0, TEMPADDR1
 	LDR r1, =string1
 	MOV r3, #0
+	B	loop
 
 loop
-	LDRB r2, [r1]	; string
-	ADD r1, r1, #1	; move to next character
-	ADD r3, r3, #1	; plus one len
+	LDRB r2, [r1]
+	ADD r1, r1, #1
+	ADD r3, r3, #1
 	CMP r2, #0
 	BEQ done
 	B loop
