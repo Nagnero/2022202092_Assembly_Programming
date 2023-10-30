@@ -1,0 +1,82 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             ARMex, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         
+    4 00000000         start
+    5 00000000 E59F0020        LDR              r0, TEMPADDR1
+    6 00000004 E3A01002        MOV              r1, #2
+    7 00000008 E3A02001        MOV              r2, #1
+    8 0000000C E4802004        STR              r2, [r0], #4
+    9 00000010         
+   10 00000010         loop
+   11 00000010 E0020291        MUL              r2, r1, r2
+   12 00000014 E4802004        STR              r2, [r0], #4
+   13 00000018 E2811001        ADD              r1, #1
+   14 0000001C E351000B        CMP              r1, #11
+   15 00000020 0A000001        BEQ              endline
+   16 00000024 EAFFFFF9        B                loop
+   17 00000028         
+   18 00000028 00040000 
+                       TEMPADDR1
+                               &                &40000
+   19 0000002C         
+   20 0000002C         endline
+   21 0000002C E1A0F00E        MOV              pc, lr
+   22 00000030                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\problem2.d -o.\objects\problem2.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 529" --list=.\listings\problem2.lst problem2.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+ARMex 00000000
+
+Symbol: ARMex
+   Definitions
+      At line 1 in file problem2.s
+   Uses
+      None
+Comment: ARMex unused
+TEMPADDR1 00000028
+
+Symbol: TEMPADDR1
+   Definitions
+      At line 18 in file problem2.s
+   Uses
+      At line 5 in file problem2.s
+Comment: TEMPADDR1 used once
+endline 0000002C
+
+Symbol: endline
+   Definitions
+      At line 20 in file problem2.s
+   Uses
+      At line 15 in file problem2.s
+Comment: endline used once
+loop 00000010
+
+Symbol: loop
+   Definitions
+      At line 10 in file problem2.s
+   Uses
+      At line 16 in file problem2.s
+Comment: loop used once
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 4 in file problem2.s
+   Uses
+      None
+Comment: start unused
+5 symbols
+337 symbols in table
