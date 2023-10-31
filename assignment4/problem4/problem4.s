@@ -23,7 +23,7 @@ start
 	LSL r7, #9
 	LSR r7, #1
 	ADD r7, r7, #0x80000000
-	LSR r7, #9
+	LSR r7, #8
 	
 	; get value2's sign bit
 	STR r2, [r0]
@@ -42,82 +42,68 @@ start
 	LSL r8, #9
 	LSR r8, #1
 	ADD r8, r8, #0x80000000
-	LSR r8, #9
-	
-	
-	; check 0
-	ADD r9, r5, r7
-	CMP r9, #0
-	BEQ value10
-	ADD r9, r6, r8
-	CMP r9, #0
-	BEQ value20
-	
-	; check Nan
+	LSR r8, #8
 	
 	
 	CMP r5, r6 ; compare exponent
-	BEQ same ; exponent is equal
+	BGT val1greater
+	BLT val1lesser
+	MOV r11, r5 ; save result exponent if exponent is equal
+	B comparesign
 	
-	; exponent of val1 > val2
-	SUBHI r9, r5, r6 ; r9 = r5 - r6
-	ADDHI r6, r6, r9 ; increase val2 exponent
-	LSRHI r8, r9 ; right shift val2 mantissa
-	MOVHI r10, r5
+val1greater	; exponent of val1 > val2
+	SUB r9, r5, r6 ; r9(shift num) = r5 - r6
+	ADD r6, r6, r9 ; increase val2 exponent
+	LSR r8, r9 ; right shift val2 mantissa
+	MOV r11, r5 ; save result exponent
+	B comparesign
 	
-	; exponent of val1 < val2
-	SUBHI r9, r6, r5 ; r9 = r6 - r5
-	ADDHI r5, r5, r9 ; increase val1 exponent
-	LSRHI r7, r9 ; right shift val1 mantissa
-	MOVHI r10, r6
+val1lesser	; exponent of val1 < val2
+	SUB r9, r6, r5 ; r9(shift num) = r6 - r5
+	ADD r5, r5, r9 ; increase val1 exponent
+	LSR r7, r9 ; right shift val1 mantissa
+	MOV r11, r6 ; save result exponent
+	B comparesign
 	
-same
-	MOVEQ r10, r5
 
-	CMP r3, #0
-	BEQ val1POS
-	BNE val2NEG
+comparesign
+	CMP r3, r4 ; check sign
+	MOVEQ r10, r3 ; save result sign bit
+	ADDEQ r12, r7, r8 ; if sign is same, add mantissa
+	BEQ check10 ; and go to nomarlization
+	CMP r7, r8; if sign is different, compare mantissa
+	SUBGT r12, r7, r8
+	MOVGT r10, r3 ; save result sign bit
+	SUBLE r12, r8, r7
+	MOVLE r10, r4 ; save result sign bit
+
 	
-val1POS
-	CMP r4, #0 ; check val2 sign bit
-	MOVEQ r12, #0 ; both positive, r12 is sign bit of result
-	ADDEQ r11, r7, r8
-	BEQ 
+	; nomarlization process
+check10
+	CMP r12, #0x01000000 ; check mantissa > 10.xx
+	LSRGE r12, #1 ; right shift result mantissa
+	ADDGE r11, #1 ; increase result exponent
+	BGE check10
+
+check1
+	CMP r12, #0x00800000 ; check mantissa < 0.xx
+	LSLLT r12, #1 ; left shift result mantissa
+	SUBLT r11, #1 ; decrease result exponent
+	BLT check1
 	
-val2NEG
+finish	; after normarlization
+	SUB r12, #0x00800000 ; sub matissa bit 1.0
+	LSL r10, #31
+	ADD r10, r10, r11, LSL #23 ; add exponent bit to result
+	ADD r10, r10, r12 ; add mantissa bit to result
+	STR r10, [r0] ; store result to r0
+	B endline
 	
    
 TEMPADDR1 & &40000
-Value1 DCD 0x3F800000
-Value2 DCD 0x40500000
+Value1 DCD 0xFFF00000
+Value2 DCD 0xC1F00000
 	
-value10
-	MOV r1, #0
-
-value20
-	MOV r1, #0
-
 endline
 	MOV pc, lr
 	END
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
