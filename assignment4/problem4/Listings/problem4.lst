@@ -8,9 +8,9 @@ ARM Macro Assembler    Page 1
     2 00000000                 ENTRY
     3 00000000         
     4 00000000         start
-    5 00000000 E59F0104        LDR              r0, TEMPADDR1
-    6 00000004 E59F1104        LDR              r1, Value1  ; first value
-    7 00000008 E59F2104        LDR              r2, Value2  ; second value
+    5 00000000 E59F0110        LDR              r0, TEMPADDR1
+    6 00000004 E59F1110        LDR              r1, Value1  ; first value
+    7 00000008 E59F2110        LDR              r2, Value2  ; second value
     8 0000000C         
     9 0000000C         ; get value1's sign bit
    10 0000000C E5801000        STR              r1, [r0]
@@ -96,7 +96,7 @@ ARM Macro Assembler    Page 2
                                                             bit
    72 000000B8 0087C008        ADDEQ            r12, r7, r8 ; if sign is same, 
                                                             add mantissa
-   73 000000BC 0A000004        BEQ              check10     ; and go to nomarli
+   73 000000BC 0A000004        BEQ              checkzero   ; and go to nomarli
                                                             zation
    74 000000C0 E1570008        CMP              r7, r8      ; if sign is differ
                                                             ent, compare mantis
@@ -108,58 +108,62 @@ ARM Macro Assembler    Page 2
    78 000000D0 D1A0A004        MOVLE            r10, r4     ; save result sign 
                                                             bit
    79 000000D4         
-   80 000000D4         
-   81 000000D4         ; nomarlization process
-   82 000000D4         check10
-   83 000000D4 E35C0401        CMP              r12, #0x01000000 ; check mantis
+   80 000000D4         checkzero
+   81 000000D4 E35C0000        CMP              r12, #0
+   82 000000D8 03A0B000        MOVEQ            r11, #0
+   83 000000DC 0A000007        BEQ              finish
+   84 000000E0         
+   85 000000E0         ; normalization process
+   86 000000E0         check10
+   87 000000E0 E35C0401        CMP              r12, #0x01000000 ; check mantis
                                                             sa > 10.xx
-   84 000000D8 A1A0C0AC        LSRGE            r12, #1     ; right shift resul
+   88 000000E4 A1A0C0AC        LSRGE            r12, #1     ; right shift resul
                                                             t mantissa
-   85 000000DC A28BB001        ADDGE            r11, #1     ; increase result e
+   89 000000E8 A28BB001        ADDGE            r11, #1     ; increase result e
                                                             xponent
-   86 000000E0 AAFFFFFB        BGE              check10
-   87 000000E4         
-   88 000000E4         check1
-   89 000000E4 E35C0502        CMP              r12, #0x00800000 ; check mantis
+   90 000000EC AAFFFFFB        BGE              check10
+   91 000000F0         
+   92 000000F0         check1
+   93 000000F0 E35C0502        CMP              r12, #0x00800000 ; check mantis
                                                             sa < 0.xx
-   90 000000E8 B1A0C08C        LSLLT            r12, #1     ; left shift result
+   94 000000F4 B1A0C08C        LSLLT            r12, #1     ; left shift result
                                                              mantissa
-   91 000000EC B24BB001        SUBLT            r11, #1     ; decrease result e
-                                                            xponent
-   92 000000F0 BAFFFFFB        BLT              check1
-   93 000000F4         
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-   94 000000F4         finish                               ; after normarlizat
+   95 000000F8 B24BB001        SUBLT            r11, #1     ; decrease result e
+                                                            xponent
+   96 000000FC BAFFFFFB        BLT              check1
+   97 00000100         
+   98 00000100         finish                               ; after normarlizat
                                                             ion
-   95 000000F4 E24CC502        SUB              r12, #0x00800000 ; sub matissa 
+   99 00000100 124CC502        SUBNE            r12, #0x00800000 ; sub matissa 
                                                             bit 1.0
-   96 000000F8 E1A0AF8A        LSL              r10, #31
-   97 000000FC E08AAB8B        ADD              r10, r10, r11, LSL #23 ; add ex
+  100 00000104 E1A0AF8A        LSL              r10, #31
+  101 00000108 E08AAB8B        ADD              r10, r10, r11, LSL #23 ; add ex
                                                             ponent bit to resul
                                                             t
-   98 00000100 E08AA00C        ADD              r10, r10, r12 ; add mantissa bi
+  102 0000010C E08AA00C        ADD              r10, r10, r12 ; add mantissa bi
                                                             t to result
-   99 00000104 E580A000        STR              r10, [r0]   ; store result to r
+  103 00000110 E580A000        STR              r10, [r0]   ; store result to r
                                                             0
-  100 00000108 EA000002        B                endline
-  101 0000010C         
-  102 0000010C         
-  103 0000010C 00040000 
+  104 00000114 EA000002        B                endline
+  105 00000118         
+  106 00000118         
+  107 00000118 00040000 
                        TEMPADDR1
                                &                &40000
-  104 00000110 FFF00000 
-                       Value1  DCD              0xFFF00000
-  105 00000114 C1F00000 
-                       Value2  DCD              0xC1F00000
-  106 00000118         
-  107 00000118         endline
-  108 00000118 E1A0F00E        MOV              pc, lr
-  109 0000011C                 END
+  108 0000011C FF800000 
+                       Value1  DCD              0xFF800000
+  109 00000120 7F800000 
+                       Value2  DCD              0x7F800000
+  110 00000124         
+  111 00000124         endline
+  112 00000124 E1A0F00E        MOV              pc, lr
+  113 00000128                 END
 Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
 --depend=.\objects\problem4.d -o.\objects\problem4.o -IC:\Keil_v5\ARM\RV31\INC 
 -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
@@ -178,50 +182,63 @@ Symbol: ARMex
    Uses
       None
 Comment: ARMex unused
-TEMPADDR1 0000010C
+TEMPADDR1 00000118
 
 Symbol: TEMPADDR1
    Definitions
-      At line 103 in file problem4.s
+      At line 107 in file problem4.s
    Uses
       At line 5 in file problem4.s
 Comment: TEMPADDR1 used once
-Value1 00000110
+Value1 0000011C
 
 Symbol: Value1
    Definitions
-      At line 104 in file problem4.s
+      At line 108 in file problem4.s
    Uses
       At line 6 in file problem4.s
 Comment: Value1 used once
-Value2 00000114
+Value2 00000120
 
 Symbol: Value2
    Definitions
-      At line 105 in file problem4.s
+      At line 109 in file problem4.s
    Uses
       At line 7 in file problem4.s
 Comment: Value2 used once
-check1 000000E4
+check1 000000F0
 
 Symbol: check1
    Definitions
-      At line 88 in file problem4.s
-   Uses
       At line 92 in file problem4.s
+   Uses
+      At line 96 in file problem4.s
 Comment: check1 used once
-check10 000000D4
+check10 000000E0
 
 Symbol: check10
    Definitions
-      At line 82 in file problem4.s
+      At line 86 in file problem4.s
+   Uses
+      At line 90 in file problem4.s
+Comment: check10 used once
+checkzero 000000D4
+
+Symbol: checkzero
+   Definitions
+      At line 80 in file problem4.s
    Uses
       At line 73 in file problem4.s
-      At line 86 in file problem4.s
-
+Comment: checkzero used once
 comparesign 000000B0
 
 Symbol: comparesign
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
    Definitions
       At line 69 in file problem4.s
    Uses
@@ -229,28 +246,22 @@ Symbol: comparesign
       At line 59 in file problem4.s
       At line 66 in file problem4.s
 
-
-
-
-ARM Macro Assembler    Page 2 Alphabetic symbol ordering
-Relocatable symbols
-
-endline 00000118
+endline 00000124
 
 Symbol: endline
    Definitions
-      At line 107 in file problem4.s
+      At line 111 in file problem4.s
    Uses
-      At line 100 in file problem4.s
+      At line 104 in file problem4.s
 Comment: endline used once
-finish 000000F4
+finish 00000100
 
 Symbol: finish
    Definitions
-      At line 94 in file problem4.s
+      At line 98 in file problem4.s
    Uses
-      None
-Comment: finish unused
+      At line 83 in file problem4.s
+Comment: finish used once
 start 00000000
 
 Symbol: start
@@ -275,5 +286,5 @@ Symbol: val1lesser
    Uses
       At line 50 in file problem4.s
 Comment: val1lesser used once
-12 symbols
-344 symbols in table
+13 symbols
+345 symbols in table

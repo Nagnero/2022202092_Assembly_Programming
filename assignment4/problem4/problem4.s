@@ -70,15 +70,19 @@ comparesign
 	CMP r3, r4 ; check sign
 	MOVEQ r10, r3 ; save result sign bit
 	ADDEQ r12, r7, r8 ; if sign is same, add mantissa
-	BEQ check10 ; and go to nomarlization
+	BEQ checkzero ; and go to nomarlization
 	CMP r7, r8; if sign is different, compare mantissa
 	SUBGT r12, r7, r8
 	MOVGT r10, r3 ; save result sign bit
 	SUBLE r12, r8, r7
 	MOVLE r10, r4 ; save result sign bit
 
+checkzero
+	CMP r12, #0
+	MOVEQ r11, #0
+	BEQ finish
 	
-	; nomarlization process
+	; normalization process
 check10
 	CMP r12, #0x01000000 ; check mantissa > 10.xx
 	LSRGE r12, #1 ; right shift result mantissa
@@ -92,7 +96,7 @@ check1
 	BLT check1
 	
 finish	; after normarlization
-	SUB r12, #0x00800000 ; sub matissa bit 1.0
+	SUBNE r12, #0x00800000 ; sub matissa bit 1.0
 	LSL r10, #31
 	ADD r10, r10, r11, LSL #23 ; add exponent bit to result
 	ADD r10, r10, r12 ; add mantissa bit to result
@@ -101,8 +105,8 @@ finish	; after normarlization
 	
    
 TEMPADDR1 & &40000
-Value1 DCD 0xFFF00000
-Value2 DCD 0xC1F00000
+Value1 DCD 0xFF800000
+Value2 DCD 0x7F800000
 	
 endline
 	MOV pc, lr
