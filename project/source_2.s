@@ -64,35 +64,46 @@ compare_loop ; r3 is val1, r4 is val2
 	LDR r3, [r2]		; get first data to r3
 	LDR r5, =sorted_number_series
 	STR r3, [r5]		; get value1 sign bit to r6
-	LDRB r6, [r0, #3]
+	LDRB r6, [r5, #3]
 	CMP r6, #0x80
 	MOVCS r6, #1
 	MOVCC r6, #0
 	
 	STR r4, [r5]		; get value2 sign bit to r7
-	LDRB r7, [r0, #3]
+	LDRB r7, [r5, #3]
 	CMP r7, #0x80
 	MOVCS r7, #1
 	MOVCC r7, #0
 	
 	CMP r6, r7			; compare sign bit
-	BGT val1_bigger		; if val1 is bigger
-	BLT val2_bigger		; if val2 is bigger
+	BGT val2_bigger		; if val1 is bigger
+	BLT val1_bigger		; if val2 is bigger
 	
 	STR r3, [r5]		; get val1 exponent r8
-	LDRH r8, [r5, #3]
+	LDRH r8, [r5, #2]
 	LSL r8, #17
 	LSR r8, #24
 	
 	STR r4, [r5]		;get val2 exponent to r9
-	LDRH r9, [r5, #3]
+	LDRH r9, [r5, #2]
 	LSL r9, #17
 	LSR r9, #24
 	
-	CMP r8, r9			; compare exponent
-	BGT val1_bigger
-	BLT val2_bigger
+	CMP r8, r9			; compare exponent (sign is same)
+	BGT val1_exp_bigger
+	BLT val2_exp_bigger
 	
+	; check mantissa
+	
+val1_exp_bigger
+	CMP r6, #1			; check sign
+	BEQ val1_bigger		; sign is minus
+	B val2_bigger		; sign is plus
+	
+val2_exp_bigger
+	CMP r6, #1
+	BEQ val2_bigger
+	B val1_bigger
 
 val1_bigger ; insert data
 	MOV r3, r1			; temp addr

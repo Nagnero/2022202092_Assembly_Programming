@@ -20,13 +20,13 @@ ARM Macro Assembler    Page 1
     8 00000000         ;========== Do not change this area ===========
     9 00000000         
    10 00000000         initialization
-   11 00000000 E59F0128        LDR              r0, =0xDEADBEEF ; seed for rand
+   11 00000000 E59F0140        LDR              r0, =0xDEADBEEF ; seed for rand
                                                             om number
    12 00000004 E3A01E45        LDR              r1, =float_number_series
-   13 00000008 E59F2124        LDR              r2, =10000  ; The number of ele
+   13 00000008 E59F213C        LDR              r2, =10000  ; The number of ele
                                                             ment in stored sere
                                                             is
-   14 0000000C E59F3124        LDR              r3, =0x0EACBA90 ; constant for 
+   14 0000000C E59F313C        LDR              r3, =0x0EACBA90 ; constant for 
                                                             random number
    15 00000010         
    16 00000010         save_float_series
@@ -74,7 +74,7 @@ ARM Macro Assembler    Page 2
    50 00000064         
    51 00000064         outer_loop
    52 00000064 E1500001        CMP              r0, r1      ; check last loop
-   53 00000068 0A00002F        BEQ              exit
+   53 00000068 0A000035        BEQ              exit
    54 0000006C E3A02E45        LDR              r2, =float_number_series
    55 00000070 E5914000        LDR              r4, [r1]    ; get last data to 
                                                             r4
@@ -89,76 +89,88 @@ ARM Macro Assembler    Page 2
    63 00000084 0AFFFFFB        BEQ              next_loop
    64 00000088 E5923000        LDR              r3, [r2]    ; get first data to
                                                              r3
-   65 0000008C E59F50A8        LDR              r5, =sorted_number_series
+   65 0000008C E59F50C0        LDR              r5, =sorted_number_series
    66 00000090 E5853000        STR              r3, [r5]    ; get value1 sign b
                                                             it to r6
-   67 00000094 E5D06003        LDRB             r6, [r0, #3]
+   67 00000094 E5D56003        LDRB             r6, [r5, #3]
    68 00000098 E3560080        CMP              r6, #0x80
    69 0000009C 23A06001        MOVCS            r6, #1
    70 000000A0 33A06000        MOVCC            r6, #0
    71 000000A4         
    72 000000A4 E5854000        STR              r4, [r5]    ; get value2 sign b
                                                             it to r7
-   73 000000A8 E5D07003        LDRB             r7, [r0, #3]
+   73 000000A8 E5D57003        LDRB             r7, [r5, #3]
    74 000000AC E3570080        CMP              r7, #0x80
    75 000000B0 23A07001        MOVCS            r7, #1
    76 000000B4 33A07000        MOVCC            r7, #0
    77 000000B8         
    78 000000B8 E1560007        CMP              r6, r7      ; compare sign bit
-   79 000000BC CA00000B        BGT              val1_bigger ; if val1 is bigger
+   79 000000BC CA00001E        BGT              val2_bigger ; if val1 is bigger
                                                             
-   80 000000C0 BA000017        BLT              val2_bigger ; if val2 is bigger
+   80 000000C0 BA000010        BLT              val1_bigger ; if val2 is bigger
                                                             
    81 000000C4         
    82 000000C4 E5853000        STR              r3, [r5]    ; get val1 exponent
                                                              r8
-   83 000000C8 E1D580B3        LDRH             r8, [r5, #3]
+   83 000000C8 E1D580B2        LDRH             r8, [r5, #2]
    84 000000CC E1A08888        LSL              r8, #17
    85 000000D0 E1A08C28        LSR              r8, #24
    86 000000D4         
    87 000000D4 E5854000        STR              r4, [r5]    ;get val2 exponent 
                                                             to r9
-   88 000000D8 E1D590B3        LDRH             r9, [r5, #3]
+   88 000000D8 E1D590B2        LDRH             r9, [r5, #2]
    89 000000DC E1A09889        LSL              r9, #17
    90 000000E0 E1A09C29        LSR              r9, #24
    91 000000E4         
-   92 000000E4 E1580009        CMP              r8, r9      ; compare exponent
-   93 000000E8 CA000000        BGT              val1_bigger
-   94 000000EC BA00000C        BLT              val2_bigger
+   92 000000E4 E1580009        CMP              r8, r9      ; compare exponent 
+                                                            (sign is same)
+   93 000000E8 CA000000        BGT              val1_exp_bigger
+   94 000000EC BA000002        BLT              val2_exp_bigger
    95 000000F0         
-   96 000000F0         
-   97 000000F0         val1_bigger                          ; insert data
+   96 000000F0         ; check mantissa
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-   98 000000F0 E1A03001        MOV              r3, r1      ; temp addr
-   99 000000F4 E5934000        LDR              r4, [r3]
-  100 000000F8 E5925000        LDR              r5, [r2]
-  101 000000FC E5824000        STR              r4, [r2]
-  102 00000100 E2822004        ADD              r2, #4
-  103 00000104         loop_shift
-  104 00000104 E1520003        CMP              r2, r3
-  105 00000108 05825000        STREQ            r5, [r2]
-  106 0000010C 0AFFFFD9        BEQ              next_loop
-  107 00000110 E5926000        LDR              r6, [r2]
-  108 00000114 E5825000        STR              r5, [r2]
-  109 00000118 E1A05006        MOV              r5, r6
-  110 0000011C E2822004        ADD              r2, #4
-  111 00000120 EAFFFFF7        B                loop_shift
-  112 00000124         
-  113 00000124         val2_bigger                          ; don't switch data
+   97 000000F0         
+   98 000000F0         val1_exp_bigger
+   99 000000F0 E3560001        CMP              r6, #1      ; check sign
+  100 000000F4 0A000003        BEQ              val1_bigger ; sign is minus
+  101 000000F8 EA00000F        B                val2_bigger ; sign is plus
+  102 000000FC         
+  103 000000FC         val2_exp_bigger
+  104 000000FC E3560001        CMP              r6, #1
+  105 00000100 0A000000        BEQ              val1_bigger
+  106 00000104 EA00000C        B                val2_bigger
+  107 00000108         
+  108 00000108         val1_bigger                          ; insert data
+  109 00000108 E1A03001        MOV              r3, r1      ; temp addr
+  110 0000010C E5934000        LDR              r4, [r3]
+  111 00000110 E5925000        LDR              r5, [r2]
+  112 00000114 E5824000        STR              r4, [r2]
+  113 00000118 E2822004        ADD              r2, #4
+  114 0000011C         loop_shift
+  115 0000011C E1520003        CMP              r2, r3
+  116 00000120 05825000        STREQ            r5, [r2]
+  117 00000124 0AFFFFD3        BEQ              next_loop
+  118 00000128 E5926000        LDR              r6, [r2]
+  119 0000012C E5825000        STR              r5, [r2]
+  120 00000130 E1A05006        MOV              r5, r6
+  121 00000134 E2822004        ADD              r2, #4
+  122 00000138 EAFFFFF7        B                loop_shift
+  123 0000013C         
+  124 0000013C         val2_bigger                          ; don't switch data
                                                              and compare next l
                                                             oop
-  114 00000124 E2822004        ADD              r2, #4
-  115 00000128 EAFFFFD4        B                compare_loop
-  116 0000012C         
-  117 0000012C         
-  118 0000012C         exit
-  119 0000012C E1A0F00E        MOV              pc, LR
-  120 00000130                 END
+  125 0000013C E2822004        ADD              r2, #4
+  126 00000140 EAFFFFCE        B                compare_loop
+  127 00000144         
+  128 00000144         
+  129 00000144         exit
+  130 00000144 E1A0F00E        MOV              pc, LR
+  131 00000148                 END
               DEADBEEF 
               00002710 
               0EACBA90 
@@ -188,13 +200,13 @@ Symbol: compare_loop
       At line 61 in file source_2.s
    Uses
       At line 56 in file source_2.s
-      At line 115 in file source_2.s
+      At line 126 in file source_2.s
 
-exit 0000012C
+exit 00000144
 
 Symbol: exit
    Definitions
-      At line 118 in file source_2.s
+      At line 129 in file source_2.s
    Uses
       At line 53 in file source_2.s
 Comment: exit used once
@@ -214,13 +226,13 @@ Symbol: is_init
    Uses
       At line 18 in file source_2.s
 Comment: is_init used once
-loop_shift 00000104
+loop_shift 0000011C
 
 Symbol: loop_shift
    Definitions
-      At line 103 in file source_2.s
+      At line 114 in file source_2.s
    Uses
-      At line 111 in file source_2.s
+      At line 122 in file source_2.s
 Comment: loop_shift used once
 next_loop 00000078
 
@@ -229,7 +241,7 @@ Symbol: next_loop
       At line 57 in file source_2.s
    Uses
       At line 63 in file source_2.s
-      At line 106 in file source_2.s
+      At line 117 in file source_2.s
 
 outer_loop 00000064
 
@@ -277,25 +289,49 @@ Symbol: shift_right
    Uses
       At line 31 in file source_2.s
 Comment: shift_right used once
-val1_bigger 000000F0
+val1_bigger 00000108
 
 Symbol: val1_bigger
    Definitions
-      At line 97 in file source_2.s
+      At line 108 in file source_2.s
    Uses
-      At line 79 in file source_2.s
-      At line 93 in file source_2.s
+      At line 80 in file source_2.s
+      At line 100 in file source_2.s
+      At line 105 in file source_2.s
 
-val2_bigger 00000124
+val1_exp_bigger 000000F0
+
+Symbol: val1_exp_bigger
+   Definitions
+      At line 98 in file source_2.s
+   Uses
+      At line 93 in file source_2.s
+Comment: val1_exp_bigger used once
+val2_bigger 0000013C
+
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
 
 Symbol: val2_bigger
    Definitions
-      At line 113 in file source_2.s
+      At line 124 in file source_2.s
    Uses
-      At line 80 in file source_2.s
-      At line 94 in file source_2.s
+      At line 79 in file source_2.s
+      At line 101 in file source_2.s
+      At line 106 in file source_2.s
 
-14 symbols
+val2_exp_bigger 000000FC
+
+Symbol: val2_exp_bigger
+   Definitions
+      At line 103 in file source_2.s
+   Uses
+      At line 94 in file source_2.s
+Comment: val2_exp_bigger used once
+16 symbols
 
 
 
@@ -329,4 +365,4 @@ Symbol: sorted_number_series
       At line 65 in file source_2.s
 Comment: sorted_number_series used once
 3 symbols
-351 symbols in table
+353 symbols in table
