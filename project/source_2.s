@@ -46,13 +46,21 @@ shift_right
 is_init
 	MOV r0, r1						; r0 is last data address
 	LDR r1, =float_number_series	
+	LDR r5, =sorted_number_series
 	ADD r1, #4						; r1 will points last value
 	
 outer_loop
 	CMP r0, r1						; check last loop
 	BEQ exit
-	LDR r2, =float_number_series
-	LDR r4, [r1]					; get last data to r4
+	LDR r2, =float_number_series	; r2 saves first value
+	
+	LDR r3, [r1]					; get last data to r9
+	CMP r3, #0x80000000		; get value2 sign bit to r7
+	MOVCC r7, #0
+	MOVCS r7, #1
+	LSL r3, #1			; get val2 exponent and mantissa to r9
+	LSR r3, #1
+	
 	B compare_loop					; insert sort
 next_loop
 	ADD r1, #4
@@ -61,63 +69,44 @@ next_loop
 compare_loop ; r3 is val1, r4 is val2
 	CMP r2, r1			; check loop out
 	BEQ next_loop
-	LDR r3, [r2]		; get first data to r3
-	LDR r5, =sorted_number_series
-	STR r3, [r5]		; get value1 sign bit to r6
-	LDRB r6, [r5, #3]
-	CMP r6, #0x80
-	MOVCS r6, #1
-	MOVCC r6, #0
 	
-	STR r4, [r5]		; get value2 sign bit to r7
-	LDRB r7, [r5, #3]
-	CMP r7, #0x80
-	MOVCS r7, #1
-	MOVCC r7, #0
+	LDR r4, [r2]		; get first data to r8
+	CMP r4, #0x80000000		; get value1 sign bit to r6
+	MOVCC r6, #0	
+	MOVCS r6, #1
+	LSL r4, #1			; get val2 exponent and mantissa to r8
+	LSR r4, #1
 	
 	CMP r6, r7			; compare sign bit
 	BGT val2_bigger		; if val1 is bigger
 	BLT val1_bigger		; if val2 is bigger
 	
-	STR r3, [r5]		; get val1 exponent r8
-	LDRH r8, [r5, #2]
-	LSL r8, #17
-	LSR r8, #24
+	CMP r6, #1			; sign is same, check both sign bit
+	BEQ both_minus
 	
-	STR r4, [r5]		;get val2 exponent to r9
-	LDRH r9, [r5, #2]
-	LSL r9, #17
-	LSR r9, #24
+	CMP r3, r4			; compare exponent (sign is plus)
+	BGE val2_bigger
+	BLT val1_bigger
 	
-	CMP r8, r9			; compare exponent (sign is same)
-	BGT val1_exp_bigger
-	BLT val2_exp_bigger
+both_minus
+	CMP r3, r4
+	BGT val1_bigger
+	BLE val2_bigger
 	
-	; check mantissa
-	
-val1_exp_bigger
-	CMP r6, #1			; check sign
-	BEQ val1_bigger		; sign is minus
-	B val2_bigger		; sign is plus
-	
-val2_exp_bigger
-	CMP r6, #1
-	BEQ val2_bigger
-	B val1_bigger
 
 val1_bigger ; insert data
 	MOV r3, r1			; temp addr
 	LDR r4, [r3]
-	LDR r5, [r2]
+	LDR r7, [r2]
 	STR r4, [r2]
 	ADD r2, #4
 loop_shift
 	CMP r2, r3
-	STREQ r5, [r2]
+	STREQ r7, [r2]
 	BEQ next_loop
 	LDR r6, [r2]
-	STR r5, [r2]
-	MOV r5, r6
+	STR r7, [r2]
+	MOV r7, r6
 	ADD r2, #4
 	B loop_shift
 

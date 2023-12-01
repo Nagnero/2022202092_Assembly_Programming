@@ -127,9 +127,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>130</LineNumber>
+          <LineNumber>119</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>324</Address>
+          <Address>288</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -138,12 +138,12 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\source_2.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\project\source_2.s\130</Expression>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>52</LineNumber>
+          <LineNumber>50</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>100</Address>
           <ByteObject>0</ByteObject>
@@ -154,23 +154,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\source_2.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\project\source_2.s\52</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>49</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>96</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\source_2.s</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\project\source_2.s\49</Expression>
+          <Expression>\\project\source_2.s\50</Expression>
         </Bp>
       </Breakpoint>
       <MemoryWindow1>
