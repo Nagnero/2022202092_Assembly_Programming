@@ -46,7 +46,7 @@ shift_right
 is_init
 	MOV r0, r1						; r0 is last data address
 	LDR r1, =float_number_series	
-	LDR r5, =sorted_number_series
+	LDR r5, =final_result_series
 	ADD r1, #4						; r1 will points last value
 	
 outer_loop
@@ -95,13 +95,12 @@ both_minus
 	
 
 val1_bigger ; insert data
-	MOV r3, r1			; temp addr
-	LDR r4, [r3]
+	LDR r4, [r1]
 	LDR r7, [r2]
 	STR r4, [r2]
 	ADD r2, #4
 loop_shift
-	CMP r2, r3
+	CMP r2, r1
 	STREQ r7, [r2]
 	BEQ next_loop
 	LDR r6, [r2]
@@ -116,6 +115,12 @@ val2_bigger ; don't switch data and compare next loop
 	
 
 exit
+	LDR r1, =float_number_series
+copy_loop
+	LDR r2, [r1], #4
+	STR r2, [r5], #4
+	CMP r0, r1
+	BNE copy_loop
 	MOV pc, LR
 	END
 
