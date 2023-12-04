@@ -54,11 +54,9 @@ outer_loop
 	BEQ exit
 	LDR r2, =float_number_series	; r2 saves first value
 	
-	LDR r3, [r1]					; get last data to r9
-	CMP r3, #0x80000000		; get value2 sign bit to r7
-	MOVCC r7, #0
-	MOVCS r7, #1
-	LSL r3, #1			; get val2 exponent and mantissa to r9
+	LDR r3, [r1]					; get last data to r3
+	MOV r7, r3, LSR #31			; get value2 sign bit to r7
+	LSL r3, #1			; get val2 exponent and mantissa to r3
 	LSR r3, #1
 	
 	B compare_loop					; insert sort
@@ -70,11 +68,9 @@ compare_loop ; r3 is val1, r4 is val2
 	CMP r2, r1			; check loop out
 	BEQ next_loop
 	
-	LDR r4, [r2]		; get first data to r8
-	CMP r4, #0x80000000		; get value1 sign bit to r6
-	MOVCC r6, #0	
-	MOVCS r6, #1
-	LSL r4, #1			; get val2 exponent and mantissa to r8
+	LDR r4, [r2]		; get first data to r4
+	MOV r6, r4, LSR #31		; get value1 sign bit to r6
+	LSL r4, #1			; get val2 exponent and mantissa to r4
 	LSR r4, #1
 	
 	CMP r6, r7			; compare sign bit
@@ -121,7 +117,7 @@ copy_loop
 	STR r2, [r5], #4
 	CMP r0, r1
 	BNE copy_loop
-	MOV pc, LR
+	MOV pc, #0
 	END
 
 ;========== End your code here ===========

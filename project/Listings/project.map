@@ -14,14 +14,16 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    code_area                                0x00000000   Section      324  source_2.o(code_area)
+    code_area                                0x00000000   Section      308  source_2.o(code_area)
+    source_1.s                               0x00000000   Number         0  source_1.o ABSOLUTE
     source_2.s                               0x00000000   Number         0  source_2.o ABSOLUTE
+    code_area                                0x00000134   Section      420  source_1.o(code_area)
 
     Global Symbols
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    BuildAttributes$$THM_ISAv2$ARM_ISAv5$E$P$S$PE$A:L22$X:L11$S22$IEEE1$IW$USESV6$~STKCKD$USESV7$~SHL$OSPACE$EBA8$STANDARDLIB$PRES8$EABIv2 0x00000000   Number         0  anon$$obj.o ABSOLUTE
+    BuildAttributes$$THM_ISAv2$ARM_ISAv5$E$P$S$PE$A:L22$X:L11$S22$IEEE1$IW$USESV6$~STKCKD$USESV7$~SHL$OSPACE$EBA8$STANDARDLIB$EABIv2 0x00000000   Number         0  anon$$obj.o ABSOLUTE
 
 
 
@@ -31,21 +33,22 @@ Memory Map of the image
 
   Image Entry point : 0x00000000
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000144, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x000002d8, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000144, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x000002d8, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x00000000   0x00000000   0x00000144   Code   RO            1  * code_area           source_2.o
+    0x00000000   0x00000000   0x00000134   Code   RO            1  * code_area           source_2.o
+    0x00000134   0x00000134   0x000001a4   Code   RO            6  * code_area           source_1.o
 
 
-    Execution Region ER_RW (Exec base: 0x00000000, Load base: 0x00000144, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x00000000, Load base: 0x000002d8, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
 
     **** No section assigned to this execution region ****
 
 
-    Execution Region ER_ZI (Exec base: 0x00000000, Load base: 0x00000144, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x00000000, Load base: 0x000002d8, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
 
     **** No section assigned to this execution region ****
 
@@ -57,10 +60,11 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       324         16          0          0          0        340   source_2.o
+       420         20          0          0          0        340   source_1.o
+       308         16          0          0          0        344   source_2.o
 
     ----------------------------------------------------------------------
-       324         16          0          0          0        340   Object Totals
+       728         36          0          0          0        684   Object Totals
          0          0          0          0          0          0   (incl. Generated)
          0          0          0          0          0          0   (incl. Padding)
 
@@ -75,15 +79,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-       324         16          0          0          0        340   Grand Totals
-       324         16          0          0          0        340   ELF Image Totals
-       324         16          0          0          0          0   ROM Totals
+       728         36          0          0          0        684   Grand Totals
+       728         36          0          0          0        684   ELF Image Totals
+       728         36          0          0          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                  324 (   0.32kB)
+    Total RO  Size (Code + RO Data)                  728 (   0.71kB)
     Total RW  Size (RW Data + ZI Data)                 0 (   0.00kB)
-    Total ROM Size (Code + RO Data + RW Data)        324 (   0.32kB)
+    Total ROM Size (Code + RO Data + RW Data)        728 (   0.71kB)
 
 ==============================================================================
 

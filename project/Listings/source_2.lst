@@ -20,13 +20,13 @@ ARM Macro Assembler    Page 1
     8 00000000         ;========== Do not change this area ===========
     9 00000000         
    10 00000000         initialization
-   11 00000000 E59F012C        LDR              r0, =0xDEADBEEF ; seed for rand
+   11 00000000 E59F011C        LDR              r0, =0xDEADBEEF ; seed for rand
                                                             om number
    12 00000004 E3A01E45        LDR              r1, =float_number_series
-   13 00000008 E59F2128        LDR              r2, =10000  ; The number of ele
+   13 00000008 E59F2118        LDR              r2, =10000  ; The number of ele
                                                             ment in stored sere
                                                             is
-   14 0000000C E59F3128        LDR              r3, =0x0EACBA90 ; constant for 
+   14 0000000C E59F3118        LDR              r3, =0x0EACBA90 ; constant for 
                                                             random number
    15 00000010         
    16 00000010         save_float_series
@@ -69,106 +69,102 @@ ARM Macro Assembler    Page 1
 ARM Macro Assembler    Page 2 
 
 
-   49 00000060 E59F50D8        LDR              r5, =final_result_series
+   49 00000060 E59F50C8        LDR              r5, =final_result_series
    50 00000064 E2811004        ADD              r1, #4      ; r1 will points la
                                                             st value
    51 00000068         
    52 00000068         outer_loop
    53 00000068 E1500001        CMP              r0, r1      ; check last loop
-   54 0000006C 0A00002A        BEQ              exit
+   54 0000006C 0A000026        BEQ              exit
    55 00000070 E3A02E45        LDR              r2, =float_number_series ; r2 s
                                                             aves first value
    56 00000074         
    57 00000074 E5913000        LDR              r3, [r1]    ; get last data to 
-                                                            r9
-   58 00000078 E3530102        CMP              r3, #0x80000000 ; get value2 si
+                                                            r3
+   58 00000078 E1A07FA3        MOV              r7, r3, LSR #31 ; get value2 si
                                                             gn bit to r7
-   59 0000007C 33A07000        MOVCC            r7, #0
-   60 00000080 23A07001        MOVCS            r7, #1
-   61 00000084 E1A03083        LSL              r3, #1      ; get val2 exponent
-                                                             and mantissa to r9
+   59 0000007C E1A03083        LSL              r3, #1      ; get val2 exponent
+                                                             and mantissa to r3
                                                             
-   62 00000088 E1A030A3        LSR              r3, #1
-   63 0000008C         
-   64 0000008C EA000001        B                compare_loop ; insert sort
-   65 00000090         next_loop
-   66 00000090 E2811004        ADD              r1, #4
-   67 00000094 EAFFFFF3        B                outer_loop  ; repeat loop
-   68 00000098         
-   69 00000098         compare_loop                         ; r3 is val1, r4 is
+   60 00000080 E1A030A3        LSR              r3, #1
+   61 00000084         
+   62 00000084 EA000001        B                compare_loop ; insert sort
+   63 00000088         next_loop
+   64 00000088 E2811004        ADD              r1, #4
+   65 0000008C EAFFFFF5        B                outer_loop  ; repeat loop
+   66 00000090         
+   67 00000090         compare_loop                         ; r3 is val1, r4 is
                                                              val2
-   70 00000098 E1520001        CMP              r2, r1      ; check loop out
-   71 0000009C 0AFFFFFB        BEQ              next_loop
-   72 000000A0         
-   73 000000A0 E5924000        LDR              r4, [r2]    ; get first data to
-                                                             r8
-   74 000000A4 E3540102        CMP              r4, #0x80000000 ; get value1 si
+   68 00000090 E1520001        CMP              r2, r1      ; check loop out
+   69 00000094 0AFFFFFB        BEQ              next_loop
+   70 00000098         
+   71 00000098 E5924000        LDR              r4, [r2]    ; get first data to
+                                                             r4
+   72 0000009C E1A06FA4        MOV              r6, r4, LSR #31 ; get value1 si
                                                             gn bit to r6
-   75 000000A8 33A06000        MOVCC            r6, #0
-   76 000000AC 23A06001        MOVCS            r6, #1
-   77 000000B0 E1A04084        LSL              r4, #1      ; get val2 exponent
-                                                             and mantissa to r8
+   73 000000A0 E1A04084        LSL              r4, #1      ; get val2 exponent
+                                                             and mantissa to r4
                                                             
-   78 000000B4 E1A040A4        LSR              r4, #1
-   79 000000B8         
-   80 000000B8 E1560007        CMP              r6, r7      ; compare sign bit
-   81 000000BC CA000014        BGT              val2_bigger ; if val1 is bigger
+   74 000000A4 E1A040A4        LSR              r4, #1
+   75 000000A8         
+   76 000000A8 E1560007        CMP              r6, r7      ; compare sign bit
+   77 000000AC CA000014        BGT              val2_bigger ; if val1 is bigger
                                                             
-   82 000000C0 BA000007        BLT              val1_bigger ; if val2 is bigger
+   78 000000B0 BA000007        BLT              val1_bigger ; if val2 is bigger
                                                             
-   83 000000C4         
-   84 000000C4 E3560001        CMP              r6, #1      ; sign is same, che
+   79 000000B4         
+   80 000000B4 E3560001        CMP              r6, #1      ; sign is same, che
                                                             ck both sign bit
-   85 000000C8 0A000002        BEQ              both_minus
-   86 000000CC         
-   87 000000CC E1530004        CMP              r3, r4      ; compare exponent 
+   81 000000B8 0A000002        BEQ              both_minus
+   82 000000BC         
+   83 000000BC E1530004        CMP              r3, r4      ; compare exponent 
                                                             (sign is plus)
-   88 000000D0 AA00000F        BGE              val2_bigger
-   89 000000D4 BA000002        BLT              val1_bigger
-   90 000000D8         
-   91 000000D8         both_minus
-   92 000000D8 E1530004        CMP              r3, r4
+   84 000000C0 AA00000F        BGE              val2_bigger
+   85 000000C4 BA000002        BLT              val1_bigger
+   86 000000C8         
+   87 000000C8         both_minus
+   88 000000C8 E1530004        CMP              r3, r4
+   89 000000CC CA000000        BGT              val1_bigger
+   90 000000D0 DA00000B        BLE              val2_bigger
+   91 000000D4         
+   92 000000D4         
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-   93 000000DC CA000000        BGT              val1_bigger
-   94 000000E0 DA00000B        BLE              val2_bigger
-   95 000000E4         
-   96 000000E4         
-   97 000000E4         val1_bigger                          ; insert data
-   98 000000E4 E5914000        LDR              r4, [r1]
-   99 000000E8 E5927000        LDR              r7, [r2]
-  100 000000EC E5824000        STR              r4, [r2]
-  101 000000F0 E2822004        ADD              r2, #4
-  102 000000F4         loop_shift
-  103 000000F4 E1520001        CMP              r2, r1
-  104 000000F8 05827000        STREQ            r7, [r2]
-  105 000000FC 0AFFFFE3        BEQ              next_loop
-  106 00000100 E5926000        LDR              r6, [r2]
-  107 00000104 E5827000        STR              r7, [r2]
-  108 00000108 E1A07006        MOV              r7, r6
-  109 0000010C E2822004        ADD              r2, #4
-  110 00000110 EAFFFFF7        B                loop_shift
-  111 00000114         
-  112 00000114         val2_bigger                          ; don't switch data
+   93 000000D4         val1_bigger                          ; insert data
+   94 000000D4 E5914000        LDR              r4, [r1]
+   95 000000D8 E5927000        LDR              r7, [r2]
+   96 000000DC E5824000        STR              r4, [r2]
+   97 000000E0 E2822004        ADD              r2, #4
+   98 000000E4         loop_shift
+   99 000000E4 E1520001        CMP              r2, r1
+  100 000000E8 05827000        STREQ            r7, [r2]
+  101 000000EC 0AFFFFE5        BEQ              next_loop
+  102 000000F0 E5926000        LDR              r6, [r2]
+  103 000000F4 E5827000        STR              r7, [r2]
+  104 000000F8 E1A07006        MOV              r7, r6
+  105 000000FC E2822004        ADD              r2, #4
+  106 00000100 EAFFFFF7        B                loop_shift
+  107 00000104         
+  108 00000104         val2_bigger                          ; don't switch data
                                                              and compare next l
                                                             oop
-  113 00000114 E2822004        ADD              r2, #4
-  114 00000118 EAFFFFDE        B                compare_loop
-  115 0000011C         
-  116 0000011C         
-  117 0000011C         exit
-  118 0000011C E3A01E45        LDR              r1, =float_number_series
-  119 00000120         copy_loop
-  120 00000120 E4912004        LDR              r2, [r1], #4
-  121 00000124 E4852004        STR              r2, [r5], #4
-  122 00000128 E1500001        CMP              r0, r1
-  123 0000012C 1AFFFFFB        BNE              copy_loop
-  124 00000130 E1A0F00E        MOV              pc, LR
-  125 00000134                 END
+  109 00000104 E2822004        ADD              r2, #4
+  110 00000108 EAFFFFE0        B                compare_loop
+  111 0000010C         
+  112 0000010C         
+  113 0000010C         exit
+  114 0000010C E3A01E45        LDR              r1, =float_number_series
+  115 00000110         copy_loop
+  116 00000110 E4912004        LDR              r2, [r1], #4
+  117 00000114 E4852004        STR              r2, [r5], #4
+  118 00000118 E1500001        CMP              r0, r1
+  119 0000011C 1AFFFFFB        BNE              copy_loop
+  120 00000120 E3A0F000        MOV              pc, #0
+  121 00000124                 END
               DEADBEEF 
               00002710 
               0EACBA90 
@@ -183,13 +179,13 @@ ON_VERSION SETA 529" --list=.\listings\source_2.lst source_2.s
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-both_minus 000000D8
+both_minus 000000C8
 
 Symbol: both_minus
    Definitions
-      At line 91 in file source_2.s
+      At line 87 in file source_2.s
    Uses
-      At line 85 in file source_2.s
+      At line 81 in file source_2.s
 Comment: both_minus used once
 code_area 00000000
 
@@ -199,28 +195,28 @@ Symbol: code_area
    Uses
       None
 Comment: code_area unused
-compare_loop 00000098
+compare_loop 00000090
 
 Symbol: compare_loop
    Definitions
-      At line 69 in file source_2.s
+      At line 67 in file source_2.s
    Uses
-      At line 64 in file source_2.s
-      At line 114 in file source_2.s
+      At line 62 in file source_2.s
+      At line 110 in file source_2.s
 
-copy_loop 00000120
+copy_loop 00000110
 
 Symbol: copy_loop
    Definitions
-      At line 119 in file source_2.s
+      At line 115 in file source_2.s
    Uses
-      At line 123 in file source_2.s
+      At line 119 in file source_2.s
 Comment: copy_loop used once
-exit 0000011C
+exit 0000010C
 
 Symbol: exit
    Definitions
-      At line 117 in file source_2.s
+      At line 113 in file source_2.s
    Uses
       At line 54 in file source_2.s
 Comment: exit used once
@@ -240,7 +236,7 @@ Symbol: is_init
    Uses
       At line 18 in file source_2.s
 Comment: is_init used once
-loop_shift 000000F4
+loop_shift 000000E4
 
 
 
@@ -250,18 +246,18 @@ Relocatable symbols
 
 Symbol: loop_shift
    Definitions
-      At line 102 in file source_2.s
+      At line 98 in file source_2.s
    Uses
-      At line 110 in file source_2.s
+      At line 106 in file source_2.s
 Comment: loop_shift used once
-next_loop 00000090
+next_loop 00000088
 
 Symbol: next_loop
    Definitions
-      At line 65 in file source_2.s
+      At line 63 in file source_2.s
    Uses
-      At line 71 in file source_2.s
-      At line 105 in file source_2.s
+      At line 69 in file source_2.s
+      At line 101 in file source_2.s
 
 outer_loop 00000068
 
@@ -269,7 +265,7 @@ Symbol: outer_loop
    Definitions
       At line 52 in file source_2.s
    Uses
-      At line 67 in file source_2.s
+      At line 65 in file source_2.s
 Comment: outer_loop used once
 random_float_number 0000002C
 
@@ -303,7 +299,7 @@ Symbol: shift_right
    Uses
       At line 31 in file source_2.s
 Comment: shift_right used once
-val1_bigger 000000E4
+val1_bigger 000000D4
 
 Symbol: val1_bigger
    Definitions
@@ -313,21 +309,21 @@ Symbol: val1_bigger
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
 
-      At line 97 in file source_2.s
-   Uses
-      At line 82 in file source_2.s
-      At line 89 in file source_2.s
       At line 93 in file source_2.s
+   Uses
+      At line 78 in file source_2.s
+      At line 85 in file source_2.s
+      At line 89 in file source_2.s
 
-val2_bigger 00000114
+val2_bigger 00000104
 
 Symbol: val2_bigger
    Definitions
-      At line 112 in file source_2.s
+      At line 108 in file source_2.s
    Uses
-      At line 81 in file source_2.s
-      At line 88 in file source_2.s
-      At line 94 in file source_2.s
+      At line 77 in file source_2.s
+      At line 84 in file source_2.s
+      At line 90 in file source_2.s
 
 16 symbols
 
@@ -353,7 +349,7 @@ Symbol: float_number_series
       At line 12 in file source_2.s
       At line 48 in file source_2.s
       At line 55 in file source_2.s
-      At line 118 in file source_2.s
+      At line 114 in file source_2.s
 
 sorted_number_series 00018AEC
 

@@ -20,13 +20,13 @@ ARM Macro Assembler    Page 1
     8 00000000         ;========== Do not change this area ===========
     9 00000000         
    10 00000000         initialization
-   11 00000000 E59F0058        LDR              r0, =0xDEADBEEF ; seed for rand
+   11 00000000 E59F0188        LDR              r0, =0xDEADBEEF ; seed for rand
                                                             om number
    12 00000004 E3A01E45        LDR              r1, =float_number_series
-   13 00000008 E59F2054        LDR              r2, =10000  ; The number of ele
+   13 00000008 E59F2184        LDR              r2, =10000  ; The number of ele
                                                             ment in stored sere
                                                             is
-   14 0000000C E59F3054        LDR              r3, =0x0EACBA90 ; constant for 
+   14 0000000C E59F3184        LDR              r3, =0x0EACBA90 ; constant for 
                                                             random number
    15 00000010         
    16 00000010         save_float_series
@@ -60,23 +60,151 @@ ARM Macro Assembler    Page 1
    44 00000058         ;========== Start your code here ===========
    45 00000058         
    46 00000058         ms_init
-   47 00000058 E3A01E45        LDR              r1, =float_number_series
-   48 0000005C E59F2000        LDR              r2, =10000  ; The number of ele
-                                                            ment in stored sere
+   47 00000058 E59FD13C        LDR              r13, =sorted_number_series
+   48 0000005C E1A00001        MOV              r0, r1      ; r0 is last data a
+                                                            ddress
 
 
 
 ARM Macro Assembler    Page 2 
 
 
+   49 00000060 E59F212C        LDR              r2, =10000  ; The number of ele
+                                                            ment in stored sere
                                                             is
-   49 00000060         
-   50 00000060         
-   51 00000060         exit
-   52 00000060                 END
+   50 00000064         
+   51 00000064         merge_sort
+   52 00000064 E3A03001        MOV              r3, #1      ; r3 is current siz
+                                                            e
+   53 00000068         outer_loop
+   54 00000068 E1530002        CMP              r3, r2
+   55 0000006C CA000046        BGT              exit        ; exit condition
+   56 00000070 E3A04000        MOV              r4, #0      ; r4 is left start
+   57 00000074         inner_loop
+   58 00000074 E2425001        SUB              r5, r2, #1  ; r5 is temp val (l
+                                                            ength - 1)
+   59 00000078 E1540005        CMP              r4, r5      ; check inner loop 
+                                                            exit condition
+   60 0000007C A1A03083        LSLGE            r3, #1
+   61 00000080 AAFFFFF8        BGE              outer_loop
+   62 00000084 E2436001        SUB              r6, r3, #1  ; r6 is temp val (c
+                                                            urrent size - 1)
+   63 00000088 E0847006        ADD              r7, r4, r6  ; r7 is mid
+   64 0000008C E0848083        ADD              r8, r4, r3, LSL #1 ; r8 is temp
+                                                             val (left + 2*curr
+                                                            ent size)
+   65 00000090 E2488001        SUB              r8, #1
+   66 00000094 E1580005        CMP              r8, r5
+   67 00000098 B0849083        ADDLT            r9, r4, r3, LSL #1 
+                                                            ; r9 is right
+   68 0000009C B2499001        SUBLT            r9, #1
+   69 000000A0 A1A09005        MOVGE            r9, r5
+   70 000000A4 EB000001        BL               merge
+   71 000000A8 E0844083        ADD              r4, r3, LSL #1
+   72 000000AC EAFFFFF0        B                inner_loop
+   73 000000B0         
+   74 000000B0         merge                                ; r4: left, r7: mid
+                                                            , r9: right
+   75 000000B0 E92D03FF        STMFD            sp!, {r0-r9}
+   76 000000B4 E1A00004        MOV              r0, r4      ; r0 is i
+   77 000000B8 E2871001        ADD              r1, r7, #1  ; r1 is j
+   78 000000BC E1A02004        MOV              r2, r4      ; r2 is k
+   79 000000C0 E3A03E45        LDR              r3, =float_number_series 
+                                                            ; r3 is arr
+   80 000000C4 E59F50D4        LDR              r5, =final_result_series ; r5 i
+                                                            s temp (result)
+   81 000000C8         loop1
+   82 000000C8 E7936100        LDR              r6, [r3, r0, LSL #2] ; arr[i]
+   83 000000CC E7938101        LDR              r8, [r3, r1, LSL #2] ; arr[j]
+   84 000000D0 E1500007        CMP              r0, r7
+   85 000000D4 CA000016        BGT              loop2
+   86 000000D8 E1510009        CMP              r1, r9
+   87 000000DC CA000014        BGT              loop2
+   88 000000E0 E1A0AFA6        MOV              r10, r6, LSR #31 
+                                                            ; r10 is sign bit
+   89 000000E4 E1A0BFA8        MOV              r11, r8, LSR #31 
+                                                            ; r11 is sign bit
+   90 000000E8 E15A000B        CMP              r10, r11    ; compare sign bit
+   91 000000EC CA000008        BGT              save_arri
+   92 000000F0 BA00000B        BLT              save_arrj
+   93 000000F4         
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   94 000000F4 E35A0001        CMP              r10, #1
+   95 000000F8 0A000002        BEQ              both_minus  ; both value is min
+                                                            us
+   96 000000FC E1560008        CMP              r6, r8      ; else both value i
+                                                            s plus
+   97 00000100 DA000003        BLE              save_arri
+   98 00000104 CA000006        BGT              save_arrj
+   99 00000108         
+  100 00000108         both_minus
+  101 00000108 E1560008        CMP              r6, r8
+  102 0000010C AA000000        BGE              save_arri
+  103 00000110 BA000003        BLT              save_arrj
+  104 00000114         
+  105 00000114         save_arri
+  106 00000114 E7856102        STR              r6, [r5, r2, LSL #2]
+  107 00000118 E2800001        ADD              r0, r0, #1  ; increase i
+  108 0000011C E2822001        ADD              r2, r2, #1  ; increase k
+  109 00000120 EAFFFFE8        B                loop1
+  110 00000124         save_arrj
+  111 00000124 E7858102        STR              r8, [r5, r2, LSL #2]
+  112 00000128 E2811001        ADD              r1, r1, #1  ; increase j
+  113 0000012C E2822001        ADD              r2, r2, #1  ; increase k
+  114 00000130 EAFFFFE4        B                loop1
+  115 00000134         
+  116 00000134         
+  117 00000134         loop2
+  118 00000134 E1500007        CMP              r0, r7      ; compare i and mid
+                                                            
+  119 00000138 CA000004        BGT              loop3
+  120 0000013C E7936100        LDR              r6, [r3, r0, LSL #2]
+  121 00000140 E7856102        STR              r6, [r5, r2, LSL #2]
+  122 00000144 E2800001        ADD              r0, r0, #1  ; increase i
+  123 00000148 E2822001        ADD              r2, r2, #1  ; increase k
+  124 0000014C EAFFFFF8        B                loop2
+  125 00000150         
+  126 00000150         loop3
+  127 00000150 E1510009        CMP              r1, r9      ; compare j and rig
+                                                            ht
+  128 00000154 CA000004        BGT              loop4
+  129 00000158 E7938101        LDR              r8, [r3, r1, LSL #2]
+  130 0000015C E7858102        STR              r8, [r5, r2, LSL #2]
+  131 00000160 E2811001        ADD              r1, r1, #1  ; increase j
+  132 00000164 E2822001        ADD              r2, r2, #1  ; increase k
+  133 00000168 EAFFFFF8        B                loop3
+  134 0000016C         
+  135 0000016C         loop4
+  136 0000016C E1540009        CMP              r4, r9
+  137 00000170 CA000003        BGT              exit_merge
+  138 00000174 E7956104        LDR              r6, [r5, r4, LSL #2]
+  139 00000178 E7836104        STR              r6, [r3, r4, LSL #2]
+  140 0000017C E2844001        ADD              r4, r4, #1
+  141 00000180 EAFFFFF9        B                loop4
+  142 00000184         
+  143 00000184         exit_merge
+  144 00000184 E8BD03FF        LDMFD            sp!, {r0-r9}
+  145 00000188 E1A0F00E        MOV              pc, LR
+  146 0000018C         
+  147 0000018C         exit
+  148 0000018C E3A0F000        MOV              pc, #0
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  149 00000190                 END
               DEADBEEF 
               00002710 
               0EACBA90 
+              00018AEC 
+              00031190 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
 --depend=.\objects\source_1.d -o.\objects\source_1.o -IC:\Keil_v5\ARM\RV31\INC 
 -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
@@ -87,6 +215,14 @@ ON_VERSION SETA 529" --list=.\listings\source_1.lst source_1.s
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
+both_minus 00000108
+
+Symbol: both_minus
+   Definitions
+      At line 100 in file source_1.s
+   Uses
+      At line 95 in file source_1.s
+Comment: both_minus used once
 code_area 00000000
 
 Symbol: code_area
@@ -95,14 +231,22 @@ Symbol: code_area
    Uses
       None
 Comment: code_area unused
-exit 00000060
+exit 0000018C
 
 Symbol: exit
    Definitions
-      At line 51 in file source_1.s
+      At line 147 in file source_1.s
    Uses
-      None
-Comment: exit unused
+      At line 55 in file source_1.s
+Comment: exit used once
+exit_merge 00000184
+
+Symbol: exit_merge
+   Definitions
+      At line 143 in file source_1.s
+   Uses
+      At line 137 in file source_1.s
+Comment: exit_merge used once
 initialization 00000000
 
 Symbol: initialization
@@ -111,6 +255,73 @@ Symbol: initialization
    Uses
       None
 Comment: initialization unused
+inner_loop 00000074
+
+Symbol: inner_loop
+   Definitions
+      At line 57 in file source_1.s
+   Uses
+      At line 72 in file source_1.s
+Comment: inner_loop used once
+loop1 000000C8
+
+Symbol: loop1
+   Definitions
+      At line 81 in file source_1.s
+   Uses
+      At line 109 in file source_1.s
+      At line 114 in file source_1.s
+
+loop2 00000134
+
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: loop2
+   Definitions
+      At line 117 in file source_1.s
+   Uses
+      At line 85 in file source_1.s
+      At line 87 in file source_1.s
+      At line 124 in file source_1.s
+
+loop3 00000150
+
+Symbol: loop3
+   Definitions
+      At line 126 in file source_1.s
+   Uses
+      At line 119 in file source_1.s
+      At line 133 in file source_1.s
+
+loop4 0000016C
+
+Symbol: loop4
+   Definitions
+      At line 135 in file source_1.s
+   Uses
+      At line 128 in file source_1.s
+      At line 141 in file source_1.s
+
+merge 000000B0
+
+Symbol: merge
+   Definitions
+      At line 74 in file source_1.s
+   Uses
+      At line 70 in file source_1.s
+Comment: merge used once
+merge_sort 00000064
+
+Symbol: merge_sort
+   Definitions
+      At line 51 in file source_1.s
+   Uses
+      None
+Comment: merge_sort unused
 ms_init 00000058
 
 Symbol: ms_init
@@ -119,7 +330,21 @@ Symbol: ms_init
    Uses
       At line 18 in file source_1.s
 Comment: ms_init used once
+outer_loop 00000068
+
+Symbol: outer_loop
+   Definitions
+      At line 53 in file source_1.s
+   Uses
+      At line 61 in file source_1.s
+Comment: outer_loop used once
 random_float_number 0000002C
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
 
 Symbol: random_float_number
    Definitions
@@ -127,6 +352,26 @@ Symbol: random_float_number
    Uses
       At line 19 in file source_1.s
 Comment: random_float_number used once
+save_arri 00000114
+
+Symbol: save_arri
+   Definitions
+      At line 105 in file source_1.s
+   Uses
+      At line 91 in file source_1.s
+      At line 97 in file source_1.s
+      At line 102 in file source_1.s
+
+save_arrj 00000124
+
+Symbol: save_arrj
+   Definitions
+      At line 110 in file source_1.s
+   Uses
+      At line 92 in file source_1.s
+      At line 98 in file source_1.s
+      At line 103 in file source_1.s
+
 save_float_series 00000010
 
 Symbol: save_float_series
@@ -146,18 +391,12 @@ Comment: shift_left used once
 shift_right 00000050
 
 Symbol: shift_right
-
-
-
-ARM Macro Assembler    Page 2 Alphabetic symbol ordering
-Relocatable symbols
-
    Definitions
       At line 38 in file source_1.s
    Uses
       At line 31 in file source_1.s
 Comment: shift_right used once
-8 symbols
+20 symbols
 
 
 
@@ -170,8 +409,8 @@ Symbol: final_result_series
    Definitions
       At line 6 in file source_1.s
    Uses
-      None
-Comment: final_result_series unused
+      At line 80 in file source_1.s
+Comment: final_result_series used once
 float_number_series 00000450
 
 Symbol: float_number_series
@@ -179,7 +418,7 @@ Symbol: float_number_series
       At line 4 in file source_1.s
    Uses
       At line 12 in file source_1.s
-      At line 47 in file source_1.s
+      At line 79 in file source_1.s
 
 sorted_number_series 00018AEC
 
@@ -187,7 +426,7 @@ Symbol: sorted_number_series
    Definitions
       At line 5 in file source_1.s
    Uses
-      None
-Comment: sorted_number_series unused
+      At line 47 in file source_1.s
+Comment: sorted_number_series used once
 3 symbols
-345 symbols in table
+357 symbols in table

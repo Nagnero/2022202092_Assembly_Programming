@@ -127,25 +127,41 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>124</LineNumber>
+          <LineNumber>47</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>304</Address>
+          <Address>396</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\source_2.s</Filename>
+          <Filename>.\source_1.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\project\source_2.s\124</Expression>
+          <Expression>\\project\source_1.s\47</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>50</LineNumber>
+          <LineNumber>148</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>100</Address>
+          <Address>704</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\source_1.s</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\project\source_1.s\148</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>120</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>288</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -154,7 +170,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\source_2.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\project\source_2.s\50</Expression>
+          <Expression>\\project\source_2.s\120</Expression>
         </Bp>
       </Breakpoint>
       <MemoryWindow1>
@@ -233,6 +249,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\source_2.s</PathWithFileName>
       <FilenameWithoutPath>source_2.s</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>2</FileNumber>
+      <FileType>2</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\source_1.s</PathWithFileName>
+      <FilenameWithoutPath>source_1.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
